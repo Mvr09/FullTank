@@ -1,15 +1,16 @@
 package model;
-
 import java.util.*;
 
 public class GraphMatrix<T> {
     private Map<T, Map<T, Integer>> adjacencyMatrix;
     private Map<T, Integer> indexMap;
+    private Map<T, Integer> fuelPrices;
     private int index;
 
     public GraphMatrix() {
         this.adjacencyMatrix = new HashMap<>();
         this.indexMap = new HashMap<>();
+        this.fuelPrices = new HashMap<>();
         this.index = 0;
     }
 
@@ -40,6 +41,14 @@ public class GraphMatrix<T> {
 
     public int getEdgeWeight(T source, T destination) {
         return adjacencyMatrix.get(source).get(destination);
+    }
+
+    public void setFuelPrice(T vertex, int fuelPrice) {
+        fuelPrices.put(vertex, fuelPrice);
+    }
+
+    public int getFuelPrice(T vertex) {
+        return fuelPrices.get(vertex);
     }
 
     public int[][] getAdjacencyMatrix() {

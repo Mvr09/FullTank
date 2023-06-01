@@ -2,14 +2,25 @@ package model;
 import java.util.*;
 
 public class Graph<T> {
+
     private Map<T, List<Edge<T>>> adjacencyList;
+    private Map<T, Integer> fuelPrices;
 
     public Graph() {
         this.adjacencyList = new HashMap<>();
+        this.fuelPrices = new HashMap<>();
     }
 
     public void addVertex(T vertex) {
         adjacencyList.putIfAbsent(vertex, new ArrayList<>());
+    }
+
+    public void setFuelPrice(T vertex, int fuelPrice) {
+        fuelPrices.put(vertex, fuelPrice);
+    }
+
+    public int getFuelPrice(T vertex) {
+        return fuelPrices.get(vertex);
     }
 
     public void addEdge(T source, T destination, int weight) {
@@ -49,4 +60,6 @@ public class Graph<T> {
             return weight;
         }
     }
+
+
 }
