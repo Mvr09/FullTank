@@ -1,6 +1,10 @@
 package model;
+<<<<<<< HEAD
+public class Pair<A,B>{
+=======
 
 public class Pair<A, B> {
+>>>>>>> origin/main
     private A first;
     private B second;
 
