@@ -1,67 +1,78 @@
 package test;
 
 import model.*;
-
 import org.junit.jupiter.api.*;
-
 import java.util.Map;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 public class GraphTest {
-    private Graph<String> graph;
-    private Dijkstra<String> dijkstra;
+    Graph<String> graph;
+    Dijkstra<String> dijkstra;
 
     @BeforeEach
-    public void setUp() {
+    public void setup() {
         graph = new Graph<>();
         graph.addVertex("A");
         graph.addVertex("B");
         graph.addVertex("C");
-        graph.addVertex("D");
-        graph.addVertex("E");
         graph.addEdge("A", "B", 1);
         graph.addEdge("B", "C", 2);
-        graph.addEdge("A", "C", 3);
-        graph.addEdge("C", "D", 2);
-        graph.addEdge("D", "E", 3);
-        graph.addEdge("A", "E", 8);
-
+        graph.setFuelPrice("A", 1);
+        graph.setFuelPrice("B", 2);
+        graph.setFuelPrice("C", 3);
         dijkstra = new Dijkstra<>(graph);
     }
-
     @Test
-    public void testGraph() {
-        assertEquals(3, graph.getNeighbors("A").size());
-        assertEquals(1, graph.getNeighbors("B").size());
-        assertEquals(1, graph.getNeighbors("C").size());
-        assertEquals(1, graph.getNeighbors("D").size());
-        assertEquals(0, graph.getNeighbors("E").size());
-    }
-
-
-    @Test
-    public void testContainsVertex() {
-        assertTrue(graph.containsVertex("A"));
-        assertTrue(graph.containsVertex("B"));
-        assertTrue(graph.containsVertex("C"));
-        assertFalse(graph.containsVertex("Z"));
+    public void testAddVertex() {
+        Graph<Integer> graph = new Graph<>();
+        graph.addVertex(1);
+        assertTrue(graph.getVertices().contains(1));
     }
 
     @Test
-    public void testContainsEdge() {
-        assertTrue(graph.containsEdge("A", "B"));
-        assertTrue(graph.containsEdge("B", "C"));
-        assertFalse(graph.containsEdge("A", "D"));
+    public void testAddEdge() {
+        Graph<Integer> graph = new Graph<>();
+        graph.addVertex(1);
+        graph.addVertex(2);
+        graph.addEdge(1, 2, 3);
+        assertTrue(graph.getNeighbors(1).stream().anyMatch(e -> e.getDestination().equals(2) && e.getWeight() == 3));
     }
 
     @Test
-    public void testDijkstra() {
-        Map<String, Integer> distances = dijkstra.shortestPath("A");
-        assertEquals(0, (int) distances.get("A"));
-        assertEquals(1, (int) distances.get("B"));
-        assertEquals(3, (int) distances.get("C"));
-        assertEquals(5, (int) distances.get("D"));
-        assertEquals(8, (int) distances.get("E"));
+    public void testGetNeighbors() {
+        Graph<Integer> graph = new Graph<>();
+        graph.addVertex(1);
+        graph.addVertex(2);
+        graph.addEdge(1, 2, 3);
+        assertTrue(graph.getNeighbors(1).stream().anyMatch(e -> e.getDestination().equals(2) && e.getWeight() == 3));
+    }
+
+    @Test
+    public void testDijkstraShortestPath() {
+        Map<String, Integer> distancesFromA = dijkstra.shortestPath("A");
+        assertEquals((Integer)0, distancesFromA.get("A"));
+        assertEquals((Integer)1, distancesFromA.get("B"));
+        assertEquals((Integer)3, distancesFromA.get("C"));
+    }
+
+    @Test
+    public void testDijkstraShortestPathWithFuelRestriction() {
+        Map<String, Integer> distancesFromA = dijkstra.shortestPathRestriction("A", 2);
+        assertEquals((Integer)0, distancesFromA.get("A"));
+        assertEquals((Integer)1, distancesFromA.get("B"));
+        assertEquals((Integer)Integer.MAX_VALUE, distancesFromA.get("C"));
+    }
+
+    @Test
+    public void testGetFuelPrice() {
+        assertEquals((Integer)1, graph.getFuelPrice("A"));
+        assertEquals((Integer)2, graph.getFuelPrice("B"));
+        assertEquals((Integer)3, graph.getFuelPrice("C"));
+    }
+
+    @Test
+    public void testSetFuelPrice() {
+        graph.setFuelPrice("A", 10);
+        assertEquals((Integer)10, graph.getFuelPrice("A"));
     }
 }

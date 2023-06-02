@@ -1,11 +1,14 @@
 package model;
+
 import java.util.*;
 
 public class Graph<T> {
     private Map<T, List<Edge<T>>> adjacencyList;
+    private Map<T, Integer> fuelPrices;
 
     public Graph() {
         this.adjacencyList = new HashMap<>();
+        this.fuelPrices = new HashMap<>();
     }
 
     public void addVertex(T vertex) {
@@ -30,6 +33,14 @@ public class Graph<T> {
 
     public boolean containsEdge(T source, T destination) {
         return adjacencyList.get(source).stream().anyMatch(edge -> edge.getDestination().equals(destination));
+    }
+
+    public void setFuelPrice(T vertex, int fuelPrice) {
+        fuelPrices.put(vertex, fuelPrice);
+    }
+
+    public int getFuelPrice(T vertex) {
+        return fuelPrices.get(vertex);
     }
 
     public static class Edge<T> {
