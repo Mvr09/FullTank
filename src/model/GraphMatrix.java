@@ -1,24 +1,35 @@
-
 package model;
 
 import java.util.*;
 
 public class GraphMatrix<T> {
     private Map<T, Map<T, Integer>> adjacencyMatrix;
-    private Map<T, Integer> indexMap;
     private Map<T, Integer> fuelPrices;
-    private int index;
 
     public GraphMatrix() {
         this.adjacencyMatrix = new HashMap<>();
-        this.indexMap = new HashMap<>();
         this.fuelPrices = new HashMap<>();
-        this.index = 0;
+    }
+
+    public GraphMatrix(Integer[][] matrix, List<T> vertices) {
+        this.adjacencyMatrix = new HashMap<>();
+        this.fuelPrices = new HashMap<>();
+
+        for (T vertex : vertices) {
+            addVertex(vertex);
+        }
+
+        for (int i = 0; i < matrix.length; i++) {
+            for (int j = 0; j < matrix[i].length; j++) {
+                if (matrix[i][j] != null) {
+                    addEdge(vertices.get(i), vertices.get(j), matrix[i][j]);
+                }
+            }
+        }
     }
 
     public void addVertex(T vertex) {
         adjacencyMatrix.putIfAbsent(vertex, new HashMap<>());
-        indexMap.put(vertex, index++);
     }
 
     public void addEdge(T source, T destination, int weight) {
@@ -56,12 +67,15 @@ public class GraphMatrix<T> {
     public int[][] getAdjacencyMatrix() {
         int size = adjacencyMatrix.size();
         int[][] matrix = new int[size][size];
+        List<T> vertices = new ArrayList<>(adjacencyMatrix.keySet());
 
-        for (T source : adjacencyMatrix.keySet()) {
-            for (T destination : adjacencyMatrix.get(source).keySet()) {
-                int i = indexMap.get(source);
-                int j = indexMap.get(destination);
-                matrix[i][j] = adjacencyMatrix.get(source).get(destination);
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                T source = vertices.get(i);
+                T destination = vertices.get(j);
+                if (adjacencyMatrix.containsKey(source) && adjacencyMatrix.get(source).containsKey(destination)) {
+                    matrix[i][j] = adjacencyMatrix.get(source).get(destination);
+                }
             }
         }
 
