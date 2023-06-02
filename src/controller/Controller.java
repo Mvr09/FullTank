@@ -10,7 +10,7 @@ public class Controller {
 
     public Controller() {
         this.adjacencyListGraph = new Graph<>();
-        this.adjacencyMatrixGraph = new GraphMatrix<>();
+        this.adjacencyMatrixGraph = null;
     }
 
     public void createAdjacencyListGraph(Map<String, List<String>> adjacencyList, Map<String, Integer> fuelPrices) {
@@ -22,7 +22,7 @@ public class Controller {
             String source = entry.getKey();
             List<String> destinations = entry.getValue();
             for (String destination : destinations) {
-                int weight = 1; // Default weight for adjacency list representation
+                int weight = 1;
                 adjacencyListGraph.addEdge(source, destination, weight);
             }
         }
@@ -35,33 +35,48 @@ public class Controller {
     }
 
     public void createAdjacencyMatrixGraph(Integer[][] adjacencyMatrix, List<String> vertices, Map<String, Integer> fuelPrices) {
-        GraphMatrix<String> graphMatrix = new GraphMatrix<>(adjacencyMatrix, vertices);
+        this.adjacencyMatrixGraph = new GraphMatrix<>(adjacencyMatrix, vertices);
 
         for (Map.Entry<String, Integer> entry : fuelPrices.entrySet()) {
             String vertex = entry.getKey();
             int fuelPrice = entry.getValue();
-            graphMatrix.setFuelPrice(vertex, fuelPrice);
+            this.adjacencyMatrixGraph.setFuelPrice(vertex, fuelPrice);
         }
-
-        adjacencyMatrixGraph = graphMatrix;
     }
 
-
     public Map<String, Integer> findShortestPath(String startVertex) {
-        Dijkstra<String> dijkstra = new Dijkstra<>(adjacencyListGraph);
-        return dijkstra.shortestPath(startVertex);
+        if (adjacencyMatrixGraph != null) {
+            DijkstraMatrix<String> dijkstra = new DijkstraMatrix<>(adjacencyMatrixGraph);
+            return dijkstra.shortestPath(startVertex);
+        } else {
+            Dijkstra<String> dijkstra = new Dijkstra<>(adjacencyListGraph);
+            return dijkstra.shortestPath(startVertex);
+        }
     }
 
     public Map<String, Integer> findShortestPathRestriction(String startVertex, int fuelCapacity) {
-        Dijkstra<String> dijkstra = new Dijkstra<>(adjacencyListGraph);
-        return dijkstra.shortestPathRestriction(startVertex, fuelCapacity);
+        if (adjacencyMatrixGraph != null) {
+            DijkstraMatrix<String> dijkstra = new DijkstraMatrix<>(adjacencyMatrixGraph);
+            return dijkstra.shortestPathRestriction(startVertex, fuelCapacity);
+        } else {
+            Dijkstra<String> dijkstra = new Dijkstra<>(adjacencyListGraph);
+            return dijkstra.shortestPathRestriction(startVertex, fuelCapacity);
+        }
     }
 
     public int[][] getAdjacencyMatrix() {
-        return adjacencyMatrixGraph.getAdjacencyMatrix();
+        if (adjacencyMatrixGraph != null) {
+            return adjacencyMatrixGraph.getAdjacencyMatrix();
+        }
+        return null;
     }
 
     public List<String> getVertices() {
-        return new ArrayList<>(adjacencyMatrixGraph.getVertices());
+        if (adjacencyMatrixGraph != null) {
+            return adjacencyMatrixGraph.getVertices();
+        } else {
+            return new ArrayList<>(adjacencyListGraph.getVertices());
+        }
     }
+
 }

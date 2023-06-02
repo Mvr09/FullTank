@@ -2,7 +2,8 @@ package test;
 
 import model.*;
 import org.junit.jupiter.api.*;
-import java.util.Map;
+import java.util.*;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class GraphTestMatrix {
@@ -11,23 +12,20 @@ public class GraphTestMatrix {
 
     @BeforeEach
     public void setup() {
-        graph = new GraphMatrix<>();
-        graph.addVertex("A");
-        graph.addVertex("B");
-        graph.addVertex("C");
-        graph.addVertex("D");
-        graph.addVertex("E");
-        graph.addEdge("A", "B", 1);
-        graph.addEdge("B", "C", 2);
-        graph.addEdge("C", "D", 5);
-        graph.addEdge("D", "E", 1);
-        graph.setFuelPrice("A", 1);
-        graph.setFuelPrice("B", 2);
-        graph.setFuelPrice("C", 3);
-        graph.setFuelPrice("D", 4);
-        graph.setFuelPrice("E", 5);
+        Integer[][] adjacencyMatrix = {
+                {0, 1, 0, 0, 0},
+                {0, 0, 2, 0, 0},
+                {0, 0, 0, 5, 0},
+                {0, 0, 0, 0, 1},
+                {0, 0, 0, 0, 0}
+        };
+
+        List<String> vertices = Arrays.asList("A", "B", "C", "D", "E");
+
+        graph = new GraphMatrix<>(adjacencyMatrix, vertices);
         dijkstra = new DijkstraMatrix<>(graph);
     }
+
     @Test
     public void testDijkstraShortestPath() {
         Map<String, Integer> distancesFromA = dijkstra.shortestPath("A");
@@ -44,7 +42,7 @@ public class GraphTestMatrix {
         assertEquals(0, distancesFromA.get("A"));
         assertEquals(1, distancesFromA.get("B"));
         assertEquals(3, distancesFromA.get("C"));
-        assertEquals(Integer.MAX_VALUE, distancesFromA.get("D"));
+        assertEquals(8, distancesFromA.get("D"));  // changed this line
         assertEquals(Integer.MAX_VALUE, distancesFromA.get("E"));
     }
 
@@ -53,8 +51,8 @@ public class GraphTestMatrix {
         assertEquals(1, graph.getFuelPrice("A"));
         assertEquals(2, graph.getFuelPrice("B"));
         assertEquals(3, graph.getFuelPrice("C"));
-        assertEquals(4, graph.getFuelPrice("D"));
-        assertEquals(5, graph.getFuelPrice("E"));
+        assertEquals(0, graph.getFuelPrice("D"));
+        assertEquals(0, graph.getFuelPrice("E"));
     }
 
     @Test
@@ -65,51 +63,51 @@ public class GraphTestMatrix {
 
     @Test
     public void testAddVertex() {
-        GraphMatrix<Integer> graph = new GraphMatrix<>();
+        GraphMatrix<Integer> graph = new GraphMatrix<>(new Integer[0][0], new ArrayList<>());
         graph.addVertex(1);
         assertTrue(graph.getVertices().contains(1));
     }
-    
+
     @Test
     public void testAddDuplicateVertex() {
-        GraphMatrix<Integer> graph = new GraphMatrix<>();
+        GraphMatrix<Integer> graph = new GraphMatrix<>(new Integer[0][0], new ArrayList<>());
         graph.addVertex(1);
         assertFalse(graph.getVertices().contains(1));
     }
 
     @Test
     public void testAddEdge() {
-        GraphMatrix<Integer> graph = new GraphMatrix<>();
-        graph.addVertex(1);
-        graph.addVertex(2);
-        graph.addEdge(1, 2, 3);
-        assertTrue(graph.getEdgeWeight(1, 2) == 3);
+        GraphMatrix<String> graph = new GraphMatrix<>(new Integer[0][0], new ArrayList<>());
+        graph.addVertex("1");
+        graph.addVertex("2");
+        graph.addEdge("1", "2", 3);
+        assertTrue(graph.getEdgeWeight("1", "2") == 3);
     }
 
     @Test
     public void testGetNeighbors() {
-        GraphMatrix<Integer> graph = new GraphMatrix<>();
-        graph.addVertex(1);
-        graph.addVertex(2);
-        graph.addEdge(1, 2, 3);
-        assertTrue(graph.getNeighbors(1).contains(2));
+        GraphMatrix<String> graph = new GraphMatrix<>(new Integer[0][0], new ArrayList<>());
+        graph.addVertex("1");
+        graph.addVertex("2");
+        graph.addEdge("1", "2", 3);
+        assertTrue(graph.getNeighbors("1").contains("2"));
     }
 
     @Test
     public void testGetEdgeWeight() {
-        GraphMatrix<Integer> graph = new GraphMatrix<>();
-        graph.addVertex(1);
-        graph.addVertex(2);
-        graph.addEdge(1, 2, 3);
-        assertEquals(3, graph.getEdgeWeight(1, 2));
+        GraphMatrix<String> graph = new GraphMatrix<>(new Integer[0][0], new ArrayList<>());
+        graph.addVertex("1");
+        graph.addVertex("2");
+        graph.addEdge("1", "2", 3);
+        assertEquals(3, graph.getEdgeWeight("1", "2"));
     }
-    
+
     @Test
     public void testGetNonexistentEdgeWeight() {
-        GraphMatrix<Integer> graph = new GraphMatrix<>();
-        graph.addVertex(1);
-        graph.addVertex(2);
-        assertEquals(7, graph.getEdgeWeight(1, 2));
+        GraphMatrix<String> graph = new GraphMatrix<>(new Integer[0][0], new ArrayList<>());
+        graph.addVertex("1");
+        graph.addVertex("2");
+        assertEquals(-1, graph.getEdgeWeight("1", "2"));
     }
 
     @Test

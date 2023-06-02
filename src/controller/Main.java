@@ -57,40 +57,36 @@ public class Main {
 
     private static int getUserChoice() {
         System.out.print("Enter your choice: ");
-        return scanner.nextInt();
+        try {
+            return Integer.parseInt(scanner.nextLine());
+        } catch (NumberFormatException e) {
+            return -1;
+        }
     }
 
     private static void createAdjacencyListGraph() {
-        System.out.print("Enter the number of vertices: ");
-        int numVertices = scanner.nextInt();
-        scanner.nextLine(); // Consume the newline character
-
         Map<String, List<String>> adjacencyList = new HashMap<>();
         Map<String, Integer> fuelPrices = new HashMap<>();
 
+        System.out.print("Enter the number of vertices: ");
+        int numVertices = Integer.parseInt(scanner.nextLine());
+
         for (int i = 0; i < numVertices; i++) {
-            System.out.print("Enter vertex " + (i + 1) + ": ");
+            System.out.print("Enter the vertex name: ");
             String vertex = scanner.nextLine();
             adjacencyList.put(vertex, new ArrayList<>());
-        }
 
-        for (int i = 0; i < numVertices; i++) {
-            System.out.print("Enter the number of neighbors for vertex " + (i + 1) + ": ");
-            int numNeighbors = scanner.nextInt();
-            scanner.nextLine(); // Consume the newline character
+            System.out.print("Enter the number of neighbors for vertex " + vertex + ": ");
+            int numNeighbors = Integer.parseInt(scanner.nextLine());
 
-            System.out.println("Enter neighbors for vertex " + (i + 1) + ": ");
             for (int j = 0; j < numNeighbors; j++) {
-                System.out.print("Neighbor " + (j + 1) + ": ");
+                System.out.print("Enter neighbor " + (j + 1) + ": ");
                 String neighbor = scanner.nextLine();
-                adjacencyList.get(adjacencyList.keySet().toArray()[i]).add(neighbor);
+                adjacencyList.get(vertex).add(neighbor);
             }
-        }
 
-        for (String vertex : adjacencyList.keySet()) {
-            System.out.print("Enter fuel price for vertex " + vertex + ": ");
-            int fuelPrice = scanner.nextInt();
-            scanner.nextLine(); // Consume the newline character
+            System.out.print("Enter the fuel price for vertex " + vertex + ": ");
+            int fuelPrice = Integer.parseInt(scanner.nextLine());
             fuelPrices.put(vertex, fuelPrice);
         }
 
@@ -100,30 +96,44 @@ public class Main {
 
     private static void createAdjacencyMatrixGraph() {
         System.out.print("Enter the number of vertices: ");
-        int numVertices = scanner.nextInt();
-        scanner.nextLine(); // Consume the newline character
+        int numVertices = Integer.parseInt(scanner.nextLine());
 
+        Integer[][] adjacencyMatrix = new Integer[numVertices][numVertices];
         List<String> vertices = new ArrayList<>();
+        Map<String, Integer> fuelPrices = new HashMap<>();
+
+        // First, input all vertices and their fuel prices
         for (int i = 0; i < numVertices; i++) {
             System.out.print("Enter vertex " + (i + 1) + ": ");
             String vertex = scanner.nextLine();
             vertices.add(vertex);
-        }
 
-        Integer[][] adjacencyMatrix = new Integer[numVertices][numVertices];
-        for (int i = 0; i < numVertices; i++) {
-            for (int j = 0; j < numVertices; j++) {
-                System.out.print("Enter weight from " + vertices.get(i) + " to " + vertices.get(j) + ": ");
-                adjacencyMatrix[i][j] = scanner.nextInt();
-            }
-        }
-
-        Map<String, Integer> fuelPrices = new HashMap<>();
-        for (String vertex : vertices) {
-            System.out.print("Enter fuel price for vertex " + vertex + ": ");
-            int fuelPrice = scanner.nextInt();
-            scanner.nextLine(); // Consume the newline character
+            System.out.print("Enter the fuel price for vertex " + vertex + ": ");
+            int fuelPrice = Integer.parseInt(scanner.nextLine());
             fuelPrices.put(vertex, fuelPrice);
+        }
+
+        // Then, input all edges
+        for (int i = 0; i < numVertices; i++) {
+            String vertex = vertices.get(i);
+            System.out.print("Enter the number of neighbors for vertex " + vertex + ": ");
+            int numNeighbors = Integer.parseInt(scanner.nextLine());
+
+            for (int j = 0; j < numNeighbors; j++) {
+                System.out.print("Enter neighbor " + (j + 1) + ": ");
+                String neighbor = scanner.nextLine();
+
+                // Validate that the neighbor is an existing vertex
+                if (!vertices.contains(neighbor)) {
+                    System.out.println("The neighbor must be an existing vertex. Please try again.");
+                    j--; // redo this iteration
+                    continue;
+                }
+
+                System.out.print("Enter the weight for the edge between " + vertex + " and " + neighbor + ": ");
+                int weight = Integer.parseInt(scanner.nextLine());
+                adjacencyMatrix[i][vertices.indexOf(neighbor)] = weight;
+            }
         }
 
         controller.createAdjacencyMatrixGraph(adjacencyMatrix, vertices, fuelPrices);
@@ -131,49 +141,63 @@ public class Main {
     }
 
 
-    private static void findShortestPath() {
-        scanner.nextLine(); // Consume the newline character
 
+    private static void findShortestPath() {
         System.out.print("Enter the start vertex: ");
         String startVertex = scanner.nextLine();
-
         Map<String, Integer> shortestPath = controller.findShortestPath(startVertex);
-        printShortestPath(shortestPath);
+
+        System.out.println("Shortest path from " + startVertex + ":");
+        for (Map.Entry<String, Integer> entry : shortestPath.entrySet()) {
+            String vertex = entry.getKey();
+            int distance = entry.getValue();
+            System.out.println("Vertex: " + vertex + ", Distance: " + distance);
+        }
     }
 
     private static void findShortestPathWithRestriction() {
-        scanner.nextLine(); // Consume the newline character
-
         System.out.print("Enter the start vertex: ");
         String startVertex = scanner.nextLine();
 
         System.out.print("Enter the fuel capacity: ");
-        int fuelCapacity = scanner.nextInt();
+        int fuelCapacity = Integer.parseInt(scanner.nextLine());
 
         Map<String, Integer> shortestPath = controller.findShortestPathRestriction(startVertex, fuelCapacity);
-        printShortestPath(shortestPath);
-    }
 
-    private static void printShortestPath(Map<String, Integer> shortestPath) {
-        System.out.println("Shortest path:");
+        System.out.println("Shortest path from " + startVertex + " with fuel capacity " + fuelCapacity + ":");
         for (Map.Entry<String, Integer> entry : shortestPath.entrySet()) {
-            System.out.println(entry.getKey() + ": " + entry.getValue());
+            String vertex = entry.getKey();
+            int distance = entry.getValue();
+            System.out.println("Vertex: " + vertex + ", Distance: " + distance);
         }
     }
 
     private static void printAdjacencyMatrix() {
         int[][] adjacencyMatrix = controller.getAdjacencyMatrix();
-        System.out.println("Adjacency Matrix:");
-        for (int[] row : adjacencyMatrix) {
-            for (int value : row) {
-                System.out.print(value + " ");
+
+        if (adjacencyMatrix != null) {
+            System.out.println("Adjacency Matrix:");
+            for (int i = 0; i < adjacencyMatrix.length; i++) {
+                for (int j = 0; j < adjacencyMatrix[i].length; j++) {
+                    System.out.print(adjacencyMatrix[i][j] + " ");
+                }
+                System.out.println();
             }
-            System.out.println();
+        } else {
+            System.out.println("Adjacency list does not have an adjacency matrix representation.");
         }
     }
 
     private static void printVertices() {
         List<String> vertices = controller.getVertices();
-        System.out.println("Vertices: " + vertices);
+
+        if (vertices != null) {
+            System.out.println("Vertices:");
+            for (String vertex : vertices) {
+                System.out.println(vertex);
+            }
+        } else {
+            System.out.println("No vertices found.");
+        }
     }
 }

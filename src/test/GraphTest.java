@@ -28,7 +28,7 @@ public class GraphTest {
         graph.addVertex(1);
         assertTrue(graph.getVertices().contains(1));
     }
-    
+
     @Test
     public void testAddVertexDuplicate() {
         Graph<Integer> graph = new Graph<>();

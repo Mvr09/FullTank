@@ -1,4 +1,3 @@
-
 package model;
 
 import java.util.*;
@@ -34,7 +33,7 @@ public class DijkstraMatrix<T> {
                 int altDistance = distances.get(current.getVertex()) + edgeWeight;
                 int fuelCost = fuelCosts.get(current.getVertex()) + graph.getFuelPrice(current.getVertex()) * edgeWeight;
 
-                if (fuelCost <= fuelCapacity && altDistance < distances.get(neighbor)) {
+                if (altDistance <= fuelCapacity && (altDistance < distances.get(neighbor) || fuelCost < fuelCosts.get(neighbor))) {
                     distances.replace(neighbor, altDistance);
                     fuelCosts.replace(neighbor, fuelCost);
                     pq.add(new VertexDistance<>(neighbor, altDistance));
@@ -51,9 +50,6 @@ public class DijkstraMatrix<T> {
 
         return distances;
     }
-
-
-
 
     public Map<T, Integer> shortestPath(T start) {
         Map<T, Integer> distances = new HashMap<>();

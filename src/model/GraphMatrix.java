@@ -3,82 +3,92 @@ package model;
 import java.util.*;
 
 public class GraphMatrix<T> {
-    private Map<T, Map<T, Integer>> adjacencyMatrix;
-    private Map<T, Integer> fuelPrices;
+    private final List<T> vertices;
+    private int[][] adjacencyMatrix;
+    private final Map<T, Integer> fuelPrices;
 
-    public GraphMatrix() {
-        this.adjacencyMatrix = new HashMap<>();
-        this.fuelPrices = new HashMap<>();
-    }
-
-    public GraphMatrix(Integer[][] matrix, List<T> vertices) {
-        this.adjacencyMatrix = new HashMap<>();
+    public GraphMatrix(Integer[][] adjacencyMatrix, List<T> vertices) {
+        this.adjacencyMatrix = new int[adjacencyMatrix.length][adjacencyMatrix.length];
+        this.vertices = new ArrayList<>(vertices);
         this.fuelPrices = new HashMap<>();
 
-        for (T vertex : vertices) {
-            addVertex(vertex);
-        }
-
-        for (int i = 0; i < matrix.length; i++) {
-            for (int j = 0; j < matrix[i].length; j++) {
-                if (matrix[i][j] != null) {
-                    addEdge(vertices.get(i), vertices.get(j), matrix[i][j]);
-                }
+        for (int i = 0; i < adjacencyMatrix.length; i++) {
+            for (int j = 0; j < adjacencyMatrix.length; j++) {
+                this.adjacencyMatrix[i][j] = adjacencyMatrix[i][j];
             }
         }
     }
 
     public void addVertex(T vertex) {
-        adjacencyMatrix.putIfAbsent(vertex, new HashMap<>());
+        if (!vertices.contains(vertex)) {
+            vertices.add(vertex);
+            extendAdjacencyMatrix();
+        }
     }
 
     public void addEdge(T source, T destination, int weight) {
-        adjacencyMatrix.get(source).put(destination, weight);
+        int sourceIndex = vertices.indexOf(source);
+        int destinationIndex = vertices.indexOf(destination);
+
+        if (sourceIndex != -1 && destinationIndex != -1) {
+            adjacencyMatrix[sourceIndex][destinationIndex] = weight;
+        }
     }
 
     public Set<T> getNeighbors(T vertex) {
-        return adjacencyMatrix.get(vertex).keySet();
-    }
+        Set<T> neighbors = new HashSet<>();
+        int vertexIndex = vertices.indexOf(vertex);
 
-    public Set<T> getVertices() {
-        return adjacencyMatrix.keySet();
-    }
-
-    public boolean containsVertex(T vertex) {
-        return adjacencyMatrix.containsKey(vertex);
-    }
-
-    public boolean containsEdge(T source, T destination) {
-        return adjacencyMatrix.get(source).containsKey(destination);
-    }
-
-    public int getEdgeWeight(T source, T destination) {
-        return adjacencyMatrix.get(source).get(destination);
-    }
-
-    public void setFuelPrice(T vertex, int fuelPrice) {
-        fuelPrices.put(vertex, fuelPrice);
-    }
-
-    public int getFuelPrice(T vertex) {
-        return fuelPrices.get(vertex);
-    }
-
-    public int[][] getAdjacencyMatrix() {
-        int size = adjacencyMatrix.size();
-        int[][] matrix = new int[size][size];
-        List<T> vertices = new ArrayList<>(adjacencyMatrix.keySet());
-
-        for (int i = 0; i < size; i++) {
-            for (int j = 0; j < size; j++) {
-                T source = vertices.get(i);
-                T destination = vertices.get(j);
-                if (adjacencyMatrix.containsKey(source) && adjacencyMatrix.get(source).containsKey(destination)) {
-                    matrix[i][j] = adjacencyMatrix.get(source).get(destination);
+        if (vertexIndex != -1) {
+            for (int i = 0; i < adjacencyMatrix.length; i++) {
+                if (adjacencyMatrix[vertexIndex][i] != 0) {
+                    neighbors.add(vertices.get(i));
                 }
             }
         }
 
-        return matrix;
+        return neighbors;
+    }
+
+    public int getEdgeWeight(T source, T destination) {
+        int sourceIndex = vertices.indexOf(source);
+        int destinationIndex = vertices.indexOf(destination);
+
+        if (sourceIndex != -1 && destinationIndex != -1) {
+            int weight = adjacencyMatrix[sourceIndex][destinationIndex];
+            return weight > 0 ? weight : Integer.MAX_VALUE;
+        }
+
+        return Integer.MAX_VALUE;
+    }
+
+    public List<T> getVertices() {
+        return new ArrayList<>(vertices);
+    }
+
+    public int getFuelPrice(T vertex) {
+        Integer price = fuelPrices.get(vertex);
+        return price != null ? price : 0;
+    }
+
+    public void setFuelPrice(T vertex, int price) {
+        if (vertices.contains(vertex) && price >= 0) {
+            fuelPrices.put(vertex, price);
+        }
+    }
+
+    public int[][] getAdjacencyMatrix() {
+        return adjacencyMatrix;
+    }
+
+    private void extendAdjacencyMatrix() {
+        int newSize = vertices.size();
+        int[][] newMatrix = new int[newSize][newSize];
+
+        for (int i = 0; i < adjacencyMatrix.length; i++) {
+            System.arraycopy(adjacencyMatrix[i], 0, newMatrix[i], 0, adjacencyMatrix[i].length);
+        }
+
+        adjacencyMatrix = newMatrix;
     }
 }
