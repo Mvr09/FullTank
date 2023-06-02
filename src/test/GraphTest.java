@@ -28,6 +28,13 @@ public class GraphTest {
         graph.addVertex(1);
         assertTrue(graph.getVertices().contains(1));
     }
+    
+    @Test
+    public void testAddVertexDuplicate() {
+        Graph<Integer> graph = new Graph<>();
+        graph.addVertex(1);
+        assertFalse(graph.getVertices().contains(1));
+    }
 
     @Test
     public void testAddEdge() {
@@ -74,5 +81,13 @@ public class GraphTest {
     public void testSetFuelPrice() {
         graph.setFuelPrice("A", 10);
         assertEquals((Integer)10, graph.getFuelPrice("A"));
+    }
+    @Test
+    public void testDijkstraShortestPathUnreachableDestination() {
+        Map<String, Integer> distancesFromA = dijkstra.shortestPath("D");
+        assertEquals((Integer) 0, distancesFromA.get("A"));
+        assertEquals((Integer) 1, distancesFromA.get("B"));
+        assertNull(distancesFromA.get("C"));
+        assertNull(distancesFromA.get("D"));
     }
 }
