@@ -69,6 +69,13 @@ public class GraphTestMatrix {
         graph.addVertex(1);
         assertTrue(graph.getVertices().contains(1));
     }
+    
+    @Test
+    public void testAddDuplicateVertex() {
+        GraphMatrix<Integer> graph = new GraphMatrix<>();
+        graph.addVertex(1);
+        assertFalse(graph.getVertices().contains(1));
+    }
 
     @Test
     public void testAddEdge() {
@@ -95,5 +102,19 @@ public class GraphTestMatrix {
         graph.addVertex(2);
         graph.addEdge(1, 2, 3);
         assertEquals(3, graph.getEdgeWeight(1, 2));
+    }
+    
+    @Test
+    public void testGetNonexistentEdgeWeight() {
+        GraphMatrix<Integer> graph = new GraphMatrix<>();
+        graph.addVertex(1);
+        graph.addVertex(2);
+        assertEquals(7, graph.getEdgeWeight(1, 2));
+    }
+
+    @Test
+    public void testSetFuelPriceWithNegativeValue() {
+        graph.setFuelPrice("A", -10);
+        assertEquals(-10, graph.getFuelPrice("A"));
     }
 }
